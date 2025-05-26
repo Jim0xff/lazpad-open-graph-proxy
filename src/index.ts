@@ -25,6 +25,7 @@ app.get('/robots.txt', async (req, res) => {
 
 app.get('/:target', async (req, res) => {
     const target = req.params.target as string;
+    const inviteCode = req.query.inviteCode;
     console.log('target=', target);
     if (!target) {
         return res.status(400).send('Target is required');
@@ -59,10 +60,14 @@ app.get('/:target', async (req, res) => {
         return res.redirect(BLOG_BASE_URL + '/' + target);
     }
 
-    return res.send(render(pad));
+    return res.send(render(pad, inviteCode));
 });
 
-function render(pad: any) {
+function render(pad: any, inviteCode: any) {
+    let url = `${BLOG_BASE_URL}/${pad.address}`;
+    if( inviteCode != null && inviteCode != `` ){
+        url = url + '?inviteCode=' + inviteCode;
+    }
     return `
     <!DOCTYPE html>
     <html>
@@ -76,13 +81,13 @@ function render(pad: any) {
         <meta property="og:title" content="${pad.title}" />
         <meta property="og:description" content="${pad.desc}" />
         <meta property="og:image" content="${pad.bannerImg}" />
-        <meta property="og:url" content="${BLOG_BASE_URL}/${pad.address}" />
+        <meta property="og:url" content="${url}" />
     </head>
     <body>
         <h1>${pad.title}</h1>
         <p>${pad.desc}</p>
         <img src="${pad.bannerImg}" alt="${pad.title}">
-        <a href="${BLOG_BASE_URL}/${pad.address}">Read More</a>
+        <a href="${url}">Read More</a>
     </body>
     </html>
     `;
