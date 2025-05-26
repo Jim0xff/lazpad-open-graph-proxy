@@ -56,11 +56,12 @@ app.get('/:target', async (req, res) => {
 
     pad = SOURCE_CACHE.get(target);
     console.log('pad=', pad);
-    if (!pad) {
+    const padData = pad.data;
+    if (!padData) {
         return res.redirect(BLOG_BASE_URL + '/' + target);
     }
 
-    return res.send(render(pad, inviteCode));
+    return res.send(render(padData, inviteCode));
 });
 
 function render(pad: any, inviteCode: any) {
