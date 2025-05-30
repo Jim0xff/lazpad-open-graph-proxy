@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 import axios from 'axios';
+import {ethers} from 'ethers';
+import bodyParser from "body-parser";
 
 
 const {
@@ -14,6 +16,22 @@ const {
 const SOURCE_CACHE = new Map<string, any>();
 
 const app = express();
+
+app.use(bodyParser.json());
+
+app.post('/verifySign', async(req, res)=>{
+    //const message = "Sign this message to authenticate your wallet address \nNonce: a6154976-698d-4b5e-98b4-79ab9e9da96d\nAddress: 0xd4F8bbF9c0B8AFF6D76d2C5Fa4971a36fC9e4003";
+    // const message = req.query.message as string;
+    //const sign = "0xc6083dbd8756c66991a219becfbcd96d32371f5ec252037454935c745f3e6d627c8534338b3de5743409b1c11efeb5fe180a90681daf47a8aa46858eeaefa5291b";
+    // const sign = req.query.sign as string;
+    //const expectedAddress = "0xd4F8bbF9c0B8AFF6D76d2C5Fa4971a36fC9e4003";
+    // const expectedAddress = req.query.expectedAddress as string;
+    const { message, sign, expectedAddress } = req.body;
+
+    const recoveredAddress = ethers.verifyMessage(message, sign);
+    const isValid = recoveredAddress.toLowerCase() === expectedAddress.toLowerCase();
+    return res.send({ success: isValid });
+});
 
 app.get('/', async (req, res) => {
     return res.redirect(BLOG_BASE_URL);
