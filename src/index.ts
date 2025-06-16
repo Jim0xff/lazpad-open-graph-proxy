@@ -25,7 +25,7 @@ app.use(bodyParser.json());
 
 app.use(cors({
     origin: ['*'], // 设置允许的源
-    credentials: true, // 如果需要携带 cookie
+    credentials: false, // 如果需要携带 cookie
   }));
 
 app.post('/verifySign', async(req, res)=>{
