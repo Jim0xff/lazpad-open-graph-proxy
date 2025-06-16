@@ -5,12 +5,15 @@ import express from 'express';
 import axios from 'axios';
 import {ethers} from 'ethers';
 import bodyParser from "body-parser";
+import {PinataSDK} from 'pinata';
 
 
 const {
     BLOG_BASE_URL = 'https://lazpad-web-git-test-ainur.vercel.app/pad',
     PORT = 4000,
-    SOURCE_URL = 'https://lazpad-test.lazai.network'
+    SOURCE_URL = 'https://lazpad-test.lazai.network',
+    PINATA_JWT = '',
+    GATEWAY_URL = ''
 } = process.env;
 
 const SOURCE_CACHE = new Map<string, any>();
@@ -31,6 +34,17 @@ app.post('/verifySign', async(req, res)=>{
     const recoveredAddress = ethers.verifyMessage(message, sign);
     const isValid = recoveredAddress.toLowerCase() === expectedAddress.toLowerCase();
     return res.send({ success: isValid });
+});
+
+app.post('/uploadPinata', async(req, res)=>{
+    const { fileData, question, typeStr } = req.body;
+    const pinata = new PinataSDK({
+        pinataJwt: PINATA_JWT,
+        pinataGateway: GATEWAY_URL
+      });
+    const file = new File([fileData],question,{type: typeStr});
+    const upload = await pinata.upload.public.file(file);
+    return res.send(upload);
 });
 
 app.get('/', async (req, res) => {
