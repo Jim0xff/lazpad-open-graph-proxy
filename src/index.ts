@@ -6,14 +6,15 @@ import axios from 'axios';
 import {ethers} from 'ethers';
 import bodyParser from "body-parser";
 import {PinataSDK} from 'pinata';
+import cors from 'cors';
 
 
 const {
     BLOG_BASE_URL = 'https://lazpad-web-git-test-ainur.vercel.app/pad',
     PORT = 4000,
     SOURCE_URL = 'https://lazpad-test.lazai.network',
-    PINATA_JWT = '',
-    GATEWAY_URL = ''
+    PINATA_JWT = 'https://plum-occupational-silkworm-146.mypinata.cloud',
+    GATEWAY_URL = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIxZDc0MTdhMi1kMDIwLTQ4YmItYWVmOC05N2RlODdmZTZkNTAiLCJlbWFpbCI6ImV2YW4ueUBtZXRpcy5pbyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiIwNjZmZDIzYmM3OThlY2RjZTZmOCIsInNjb3BlZEtleVNlY3JldCI6ImM5Nzc4NzA4OGUzYzUxZTZlY2QzNjY3YWQ4Mjk1OGExYTMwMjM0ZjUyNmEwNDdjOTllZjAzZTQzZDIzNjEzZTkiLCJleHAiOjE3ODEyNDc3ODF9.mTfGjYgZV_UMcOA6BQ7J47P2ojmzd4D3_fRK9vXGhC0'
 } = process.env;
 
 const SOURCE_CACHE = new Map<string, any>();
@@ -21,6 +22,11 @@ const SOURCE_CACHE = new Map<string, any>();
 const app = express();
 
 app.use(bodyParser.json());
+
+app.use(cors({
+    origin: ['*'], // 设置允许的源
+    credentials: true, // 如果需要携带 cookie
+  }));
 
 app.post('/verifySign', async(req, res)=>{
     //const message = "Sign this message to authenticate your wallet address \nNonce: a6154976-698d-4b5e-98b4-79ab9e9da96d\nAddress: 0xd4F8bbF9c0B8AFF6D76d2C5Fa4971a36fC9e4003";
