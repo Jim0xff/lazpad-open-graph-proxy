@@ -25,7 +25,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use(cors({
-    origin: ['http://localhost:3000',"https://generate-dat-web-git-dev-ainur.vercel.app","https://generate-dat-web.vercel.app"], // 设置允许的源
+    origin: ['http://localhost:3000',"https://generate-dat-web-git-dev-ainur.vercel.app","https://generate-dat-web.vercel.app","https://predat.lazai.network"], // 设置允许的源
     credentials: true, // 如果需要携带 cookie
   }));
 
