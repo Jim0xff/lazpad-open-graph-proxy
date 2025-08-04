@@ -54,6 +54,16 @@ app.post('/uploadPinata', async(req, res)=>{
     return res.send(upload);
 });
 
+app.post('/deletePinata', async(req, res)=>{
+    const { files } = req.body;
+    const pinata = new PinataSDK({
+        pinataJwt: PINATA_JWT,
+        pinataGateway: GATEWAY_URL
+      });
+    const unpin = await pinata.files.public.delete(files)
+    return res.send(unpin);
+});
+
 app.get('/', async (req, res) => {
     return res.redirect(BLOG_BASE_URL);
 });
