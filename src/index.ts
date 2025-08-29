@@ -13,6 +13,7 @@ const {
     BLOG_BASE_URL = 'https://lazpad-web-git-test-ainur.vercel.app/pad',
     PORT = 4000,
     SOURCE_URL = 'https://lazpad-test.lazai.network',
+    LAZBUBU_URL = "https://lazbubu-backend-b3z67.ondigitalocean.app",
     GATEWAY_URL = 'https://plum-occupational-silkworm-146.mypinata.cloud',
     PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIxZDc0MTdhMi1kMDIwLTQ4YmItYWVmOC05N2RlODdmZTZkNTAiLCJlbWFpbCI6ImV2YW4ueUBtZXRpcy5pbyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiIwNjZmZDIzYmM3OThlY2RjZTZmOCIsInNjb3BlZEtleVNlY3JldCI6ImM5Nzc4NzA4OGUzYzUxZTZlY2QzNjY3YWQ4Mjk1OGExYTMwMjM0ZjUyNmEwNDdjOTllZjAzZTQzZDIzNjEzZTkiLCJleHAiOjE3ODEyNDc3ODF9.mTfGjYgZV_UMcOA6BQ7J47P2ojmzd4D3_fRK9vXGhC0'
     
@@ -112,6 +113,57 @@ app.get('/:target', async (req, res) => {
 
     return res.send(render(padData, inviteCode));
 });
+
+
+app.get('chatShare/:shareId', async (req, res) => {
+    const shareId = req.params.shareId as string;
+    // const inviteCode = req.query.inviteCode;
+    if (!shareId) {
+        return res.status(400).send('shareId is required');
+    }
+
+    const userAgent = req.headers['user-agent'] as string;
+    console.log('userAgent=', userAgent);
+
+    // Check if the request is from a browser
+    const isBrowser = userAgent && (
+        userAgent.includes('Mozilla') || // Firefox, Chrome, Safari, etc.
+        userAgent.includes('Safari') ||  // Safari
+        userAgent.includes('Chrome') ||  // Chrome
+        userAgent.includes('Edge') ||    // Microsoft Edge
+        userAgent.includes('Opera')      // Opera
+    );
+    const data = await axios.get(LAZBUBU_URL + "/lazbubu/shareInfo/" + shareId).then((res) => res.data);
+
+    return res.send(renderShareChat(data, shareId));
+});
+
+function renderShareChat(data: any, shareId: string) {
+    return `
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Lazbubu</title>
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:title" content="AI 对话精选" />
+  <meta property="og:description" content="点击查看完整对话" />
+  <meta property="og:image" content="${data.imageUrl}" />
+  <meta property="og:url" content="https://lazbubu-git-test-ainur.vercel.app/share/${shareId}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="${data.imageUrl}" />
+
+  <link rel="stylesheet" href="https://lazbubu-git-test-ainur.vercel.app/assets/index-DktLmq6Z.css" />
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://lazbubu-git-test-ainur.vercel.app/assets/index-RCtcxrOl.js"></script>
+</body>
+</html>
+    `;
+}
 
 function render(pad: any, inviteCode: any) {
     let url = `${BLOG_BASE_URL}/${pad.address}`;
