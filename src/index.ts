@@ -115,7 +115,7 @@ app.get('/:target', async (req, res) => {
 });
 
 
-app.get('chatShare/:shareId', async (req, res) => {
+app.get('/chatShare/:shareId', async (req, res) => {
     const shareId = req.params.shareId as string;
     // const inviteCode = req.query.inviteCode;
     if (!shareId) {
