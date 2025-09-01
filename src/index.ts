@@ -116,25 +116,30 @@ app.get('/:target', async (req, res) => {
 
 
 app.get('/chatShare/:shareId', async (req, res) => {
-    const shareId = req.params.shareId as string;
-    // const inviteCode = req.query.inviteCode;
-    if (!shareId) {
-        return res.status(400).send('shareId is required');
+    try{
+        const shareId = req.params.shareId as string;
+        // const inviteCode = req.query.inviteCode;
+        if (!shareId) {
+            return res.status(400).send('shareId is required');
+        }
+    
+        const userAgent = req.headers['user-agent'] as string;
+        console.log('userAgent=', userAgent);
+    
+        // Check if the request is from a browser
+        const isBrowser = userAgent && (
+            userAgent.includes('Mozilla') || // Firefox, Chrome, Safari, etc.
+            userAgent.includes('Safari') ||  // Safari
+            userAgent.includes('Chrome') ||  // Chrome
+            userAgent.includes('Edge') ||    // Microsoft Edge
+            userAgent.includes('Opera')      // Opera
+        );
+        const response = await axios.get(LAZBUBU_URL + "/lazbubu/shareInfo/" + shareId).then((res) => res.data);
+        return res.send(renderShareChat(response.data, shareId));
+    }catch(error){
+        console.error(`/chatShare/` + req.params.shareId + ":error", error);
     }
-
-    const userAgent = req.headers['user-agent'] as string;
-    console.log('userAgent=', userAgent);
-
-    // Check if the request is from a browser
-    const isBrowser = userAgent && (
-        userAgent.includes('Mozilla') || // Firefox, Chrome, Safari, etc.
-        userAgent.includes('Safari') ||  // Safari
-        userAgent.includes('Chrome') ||  // Chrome
-        userAgent.includes('Edge') ||    // Microsoft Edge
-        userAgent.includes('Opera')      // Opera
-    );
-    const response = await axios.get(LAZBUBU_URL + "/lazbubu/shareInfo/" + shareId).then((res) => res.data);
-    return res.send(renderShareChat(response.data, shareId));
+    return res.status(500).send('internal error');
 });
 
 function renderShareChat(data: any, shareId: string) {
