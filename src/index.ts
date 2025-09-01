@@ -133,9 +133,8 @@ app.get('/chatShare/:shareId', async (req, res) => {
         userAgent.includes('Edge') ||    // Microsoft Edge
         userAgent.includes('Opera')      // Opera
     );
-    const data = await axios.get(LAZBUBU_URL + "/lazbubu/shareInfo/" + shareId).then((res) => res.data);
-
-    return res.send(renderShareChat(data, shareId));
+    const response = await axios.get(LAZBUBU_URL + "/lazbubu/shareInfo/" + shareId).then((res) => res.data);
+    return res.send(renderShareChat(response.data, shareId));
 });
 
 function renderShareChat(data: any, shareId: string) {
