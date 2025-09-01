@@ -180,10 +180,10 @@ function renderShareChat(data: any, shareId: string) {
     <title>Lazbubu</title>
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Lazbubu - AI Chat Highlights" />
+    <meta property="og:title" content="Chat with Lazbubu" />
     <meta
       property="og:description"
-      content="View full conversations and experience intelligent AI interactions."
+      content="Have a great conversation with my Lazbubu"
     />
     <meta property="og:image" content="${data.imageUrl}" />
     <meta
@@ -201,7 +201,7 @@ function renderShareChat(data: any, shareId: string) {
     <!-- Additional Meta Tags -->
     <meta
       name="description"
-      content="View full conversations and experience intelligent AI interactions."
+      content="Have a great conversation with my Lazbubu"
     />
     <meta
       name="keywords"
