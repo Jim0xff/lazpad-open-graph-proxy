@@ -31,7 +31,8 @@ app.use(cors({
   }));
 
 app.post('/verifySign', async(req, res)=>{
-    //const message = "Sign this message to authenticate your wallet address \nNonce: a6154976-698d-4b5e-98b4-79ab9e9da96d\nAddress: 0xd4F8bbF9c0B8AFF6D76d2C5Fa4971a36fC9e4003";
+    try{
+            //const message = "Sign this message to authenticate your wallet address \nNonce: a6154976-698d-4b5e-98b4-79ab9e9da96d\nAddress: 0xd4F8bbF9c0B8AFF6D76d2C5Fa4971a36fC9e4003";
     // const message = req.query.message as string;
     //const sign = "0xc6083dbd8756c66991a219becfbcd96d32371f5ec252037454935c745f3e6d627c8534338b3de5743409b1c11efeb5fe180a90681daf47a8aa46858eeaefa5291b";
     // const sign = req.query.sign as string;
@@ -42,27 +43,42 @@ app.post('/verifySign', async(req, res)=>{
     const recoveredAddress = ethers.verifyMessage(message, sign);
     const isValid = recoveredAddress.toLowerCase() === expectedAddress.toLowerCase();
     return res.send({ success: isValid });
+    }catch(error){
+        console.error(`/verifySignFailed`, error);
+        return res.send({ success: false });
+    }
+
 });
 
 app.post('/uploadPinata', async(req, res)=>{
-    const { fileData, question, typeStr } = req.body;
-    const pinata = new PinataSDK({
-        pinataJwt: PINATA_JWT,
-        pinataGateway: GATEWAY_URL
-      });
-    const file = new File([fileData],question,{type: typeStr});
-    const upload = await pinata.upload.public.file(file);
-    return res.send(upload);
+    try{
+        const { fileData, question, typeStr } = req.body;
+        const pinata = new PinataSDK({
+            pinataJwt: PINATA_JWT,
+            pinataGateway: GATEWAY_URL
+          });
+        const file = new File([fileData],question,{type: typeStr});
+        const upload = await pinata.upload.public.file(file);
+        return res.send(upload);
+    }catch(error){
+        console.error(`/uploadPinataFailed`, error);
+        return res.status(500).send('internal error');
+    }
 });
 
 app.post('/deletePinata', async(req, res)=>{
-    const { files } = req.body;
-    const pinata = new PinataSDK({
-        pinataJwt: PINATA_JWT,
-        pinataGateway: GATEWAY_URL
-      });
-    const unpin = await pinata.files.public.delete(files)
-    return res.send(unpin);
+    try{
+        const { files } = req.body;
+        const pinata = new PinataSDK({
+            pinataJwt: PINATA_JWT,
+            pinataGateway: GATEWAY_URL
+          });
+        const unpin = await pinata.files.public.delete(files)
+        return res.send(unpin);
+    }catch(error){
+        console.error(`/deletePinataFailed`, error);
+        return res.status(500).send('internal error');
+    }
 });
 
 app.get('/', async (req, res) => {
@@ -74,44 +90,49 @@ app.get('/robots.txt', async (req, res) => {
 });
 
 app.get('/:target', async (req, res) => {
-    const target = req.params.target as string;
-    const inviteCode = req.query.inviteCode;
-    console.log('target=', target);
-    if (!target) {
-        return res.status(400).send('Target is required');
+    try{
+        const target = req.params.target as string;
+        const inviteCode = req.query.inviteCode;
+        console.log('target=', target);
+        if (!target) {
+            return res.status(400).send('Target is required');
+        }
+    
+        const userAgent = req.headers['user-agent'] as string;
+        console.log('userAgent=', userAgent);
+    
+        // Check if the request is from a browser
+        const isBrowser = userAgent && (
+            userAgent.includes('Mozilla') || // Firefox, Chrome, Safari, etc.
+            userAgent.includes('Safari') ||  // Safari
+            userAgent.includes('Chrome') ||  // Chrome
+            userAgent.includes('Edge') ||    // Microsoft Edge
+            userAgent.includes('Opera')      // Opera
+        );
+    
+        if (isBrowser) {
+            return res.redirect(BLOG_BASE_URL + '/' + target);
+        }
+    
+        let pad = SOURCE_CACHE.get(target);
+        if (!pad) {
+            // /issue/detail?id=0x0cb7c5e34032658b730bf86ae78e9edc272d5fde
+            const data = await axios.get(SOURCE_URL + "/issue/detail?id=" + target).then((res) => res.data);
+            SOURCE_CACHE.set(target, data);
+        }
+    
+        pad = SOURCE_CACHE.get(target);
+        console.log('pad=', pad);
+        const padData = pad.data;
+        if (!padData) {
+            return res.redirect(BLOG_BASE_URL + '/' + target);
+        }
+    
+        return res.send(render(padData, inviteCode));
+    }catch(error){
+        console.error(`/target/` + req.params.target + ":error", error);
+        return res.status(500).send('internal error');
     }
-
-    const userAgent = req.headers['user-agent'] as string;
-    console.log('userAgent=', userAgent);
-
-    // Check if the request is from a browser
-    const isBrowser = userAgent && (
-        userAgent.includes('Mozilla') || // Firefox, Chrome, Safari, etc.
-        userAgent.includes('Safari') ||  // Safari
-        userAgent.includes('Chrome') ||  // Chrome
-        userAgent.includes('Edge') ||    // Microsoft Edge
-        userAgent.includes('Opera')      // Opera
-    );
-
-    if (isBrowser) {
-        return res.redirect(BLOG_BASE_URL + '/' + target);
-    }
-
-    let pad = SOURCE_CACHE.get(target);
-    if (!pad) {
-        // /issue/detail?id=0x0cb7c5e34032658b730bf86ae78e9edc272d5fde
-        const data = await axios.get(SOURCE_URL + "/issue/detail?id=" + target).then((res) => res.data);
-        SOURCE_CACHE.set(target, data);
-    }
-
-    pad = SOURCE_CACHE.get(target);
-    console.log('pad=', pad);
-    const padData = pad.data;
-    if (!padData) {
-        return res.redirect(BLOG_BASE_URL + '/' + target);
-    }
-
-    return res.send(render(padData, inviteCode));
 });
 
 
@@ -138,8 +159,8 @@ app.get('/chatShare/:shareId', async (req, res) => {
         return res.send(renderShareChat(response.data, shareId));
     }catch(error){
         console.error(`/chatShare/` + req.params.shareId + ":error", error);
+        return res.status(500).send('internal error');
     }
-    return res.status(500).send('internal error');
 });
 
 function renderShareChat(data: any, shareId: string) {
