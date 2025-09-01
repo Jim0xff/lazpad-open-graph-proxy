@@ -139,14 +139,49 @@ app.get('/chatShare/:shareId', async (req, res) => {
 
 function renderShareChat(data: any, shareId: string) {
     return `
-    <meta property="og:description" content="点击查看完整对话" />
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <meta
+      http-equiv="refresh"
+      content="0; url=https://lazbubu-git-test-ainur.vercel.app/share/${shareId}"
+    />
+    <title>Lazbubu</title>
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Lazbubu - AI Chat Highlights" />
+    <meta
+      property="og:description"
+      content="View full conversations and experience intelligent AI interactions."
+    />
     <meta property="og:image" content="${data.imageUrl}" />
     <meta
       property="og:url"
       content="https://lazbubu-git-test-ainur.vercel.app/lazbubu"
     />
+    <meta property="og:site_name" content="Lazbubu" />
+
+    <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="${data.imageUrl}" />
+    <meta name="twitter:site" content="@LazAINetwork" />
+    <meta name="twitter:creator" content="@LazAINetwork" />
+
+    <!-- Additional Meta Tags -->
+    <meta
+      name="description"
+      content="View full conversations and experience intelligent AI interactions."
+    />
+    <meta
+      name="keywords"
+      content="AI, chat, intelligence, Lazbubu, LazAINetwork, artificial intelligence"
+    />
+    <meta name="author" content="LazAINetwork" />
   </head>
   <body></body>
 </html>
