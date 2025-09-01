@@ -139,27 +139,16 @@ app.get('/chatShare/:shareId', async (req, res) => {
 
 function renderShareChat(data: any, shareId: string) {
     return `
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Lazbubu</title>
-
-  <!-- Open Graph / Twitter -->
-  <meta property="og:title" content="AI 对话精选" />
-  <meta property="og:description" content="点击查看完整对话" />
-  <meta property="og:image" content="${data.imageUrl}" />
-  <meta property="og:url" content="https://lazbubu-git-test-ainur.vercel.app/share/${shareId}" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content="${data.imageUrl}" />
-
-  <link rel="stylesheet" href="https://lazbubu-git-test-ainur.vercel.app/assets/index-DktLmq6Z.css" />
-</head>
-<body>
-  <div id="root"></div>
-  <script src="https://lazbubu-git-test-ainur.vercel.app/assets/index-RCtcxrOl.js"></script>
-</body>
+    <meta property="og:description" content="点击查看完整对话" />
+    <meta property="og:image" content="${data.imageUrl}" />
+    <meta
+      property="og:url"
+      content="https://lazbubu-git-test-ainur.vercel.app/lazbubu"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="${data.imageUrl}" />
+  </head>
+  <body></body>
 </html>
     `;
 }
