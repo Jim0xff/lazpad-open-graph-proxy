@@ -255,7 +255,7 @@ function renderShareChat(data: any, shareId: string) {
     />
     <meta
       http-equiv="refresh"
-      content="0; url=https://agents.lazai.network/share/${shareId}"
+      content="0; url=https://lazbubu.lazai.network/share/${shareId}"
     />
     <title>Lazbubu</title>
 
@@ -268,7 +268,7 @@ function renderShareChat(data: any, shareId: string) {
     <meta property="og:image" content="${data.imageUrl}" />
     <meta
       property="og:url"
-      content="https://agents.lazai.network/lazbubu"
+      content="https://lazbubu.lazai.network/lazbubu"
     />
     <meta property="og:site_name" content="Lazbubu" />
 
