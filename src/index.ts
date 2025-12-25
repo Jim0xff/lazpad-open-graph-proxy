@@ -14,6 +14,7 @@ const {
     PORT = 4000,
     SOURCE_URL = 'https://lazpad-test.lazai.network',
     LAZBUBU_URL = "https://lazbubu-backend-b3z67.ondigitalocean.app",
+    LAZBUBU_BSC_URL = "https://seahorse-app-x3bvj.ondigitalocean.app",
     GATEWAY_URL = 'https://plum-occupational-silkworm-146.mypinata.cloud',
     PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIxZDc0MTdhMi1kMDIwLTQ4YmItYWVmOC05N2RlODdmZTZkNTAiLCJlbWFpbCI6ImV2YW4ueUBtZXRpcy5pbyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiIwNjZmZDIzYmM3OThlY2RjZTZmOCIsInNjb3BlZEtleVNlY3JldCI6ImM5Nzc4NzA4OGUzYzUxZTZlY2QzNjY3YWQ4Mjk1OGExYTMwMjM0ZjUyNmEwNDdjOTllZjAzZTQzZDIzNjEzZTkiLCJleHAiOjE3ODEyNDc3ODF9.mTfGjYgZV_UMcOA6BQ7J47P2ojmzd4D3_fRK9vXGhC0'
     
@@ -162,6 +163,85 @@ app.get('/chatShare/:shareId', async (req, res) => {
         return res.status(500).send('internal error');
     }
 });
+
+app.get('/chatShareBsc/:shareId', async (req, res) => {
+    try{
+        const shareId = req.params.shareId as string;
+        // const inviteCode = req.query.inviteCode;
+        if (!shareId) {
+            return res.status(400).send('shareId is required');
+        }
+    
+        const userAgent = req.headers['user-agent'] as string;
+        console.log('userAgent=', userAgent);
+    
+        // Check if the request is from a browser
+        const isBrowser = userAgent && (
+            userAgent.includes('Mozilla') || // Firefox, Chrome, Safari, etc.
+            userAgent.includes('Safari') ||  // Safari
+            userAgent.includes('Chrome') ||  // Chrome
+            userAgent.includes('Edge') ||    // Microsoft Edge
+            userAgent.includes('Opera')      // Opera
+        );
+        const response = await axios.get(LAZBUBU_BSC_URL + "/lazbubu/shareInfo/" + shareId).then((res) => res.data);
+        return res.send(renderShareChatBsc(response.data, shareId));
+    }catch(error){
+        console.error(`/chatShare/` + req.params.shareId + ":error", error);
+        return res.status(500).send('internal error');
+    }
+});
+
+
+function renderShareChatBsc(data: any, shareId: string) {
+    return `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <meta
+      http-equiv="refresh"
+      content="0; url=https://lazbubu.ai/share/${shareId}"
+    />
+    <title>Lazbubu</title>
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Chat with Lazbubu" />
+    <meta
+      property="og:description"
+      content="Have a great conversation with my Lazbubu"
+    />
+    <meta property="og:image" content="${data.imageUrl}" />
+    <meta
+      property="og:url"
+      content="https://lazbubu.ai"
+    />
+    <meta property="og:site_name" content="Lazbubu" />
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="${data.imageUrl}" />
+    <meta name="twitter:site" content="@LazbubuAI" />
+    <meta name="twitter:creator" content="@LazbubuAI" />
+
+    <!-- Additional Meta Tags -->
+    <meta
+      name="description"
+      content="Have a great conversation with my Lazbubu"
+    />
+    <meta
+      name="keywords"
+      content="AI, chat, intelligence, Lazbubu, artificial intelligence"
+    />
+    <meta name="author" content="lazbubuai" />
+  </head>
+  <body></body>
+</html>
+    `;
+}
 
 function renderShareChat(data: any, shareId: string) {
     return `
